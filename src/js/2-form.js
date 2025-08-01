@@ -1,16 +1,44 @@
-const formData = { email: '', message: '', }; const form =
-document.querySelector('.feedback-form'); form.addEventListener('input', e => {
-const { name, value } = e.target; formData[name] = value;
-localStorage.setItem('feedback-form-state', JSON.stringify(formData)); }); const
-savedData = localStorage.getItem('feedback-form-state'); if (savedData) { const
-parsedData = JSON.parse(savedData); formData.email = parsedData.email || '';
-formData.message = parsedData.message || '';
-form.querySelector('[name="email"]').value = formData.email;
-form.querySelector('[name="message"]').value = formData.message; }
-form.addEventListener('submit', e => { e.preventDefault(); const email =
-form.querySelector('[name="email"]').value.trim(); const message =
-form.querySelector('[name="message"]').value.trim(); if (email === '' || message
-=== '') { alert('Fill please all fields'); return; } formData.email = email;
-formData.message = message; console.log(formData);
-localStorage.removeItem('feedback-form-state'); formData.email = '';
-formData.message = ''; form.reset(); });
+const form = document.querySelector('.feedback-form');
+const STORAGE_KEY = 'feedback-form-state';
+
+let formData = {
+    email: '',
+    message: '',
+};
+
+loadFormData();
+
+form.addEventListener('input', event => {
+    const { name, value } = event.target;
+    formData[name] = value.trim();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+});
+
+form.addEventListener('submit', event => {
+    event.preventDefault();
+    const { email, message } = formData;
+    if (!email.trim() || !message.trim()) {
+        alert('Fill please all fields');
+        return;
+    }
+
+console.log('Submitted data:', formData);
+
+  localStorage.removeItem(STORAGE_KEY);
+  formData = { email: '', message: '' };
+  form.reset();
+});
+
+function loadFormData() {
+  try {
+    const saveData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (saveData) {
+      formData.email = saveData.email || '';
+      formData.message = saveData.message || '';
+      form.elements.email.value = formData.email;
+      form.elements.message.value = formData.message;
+    }
+  } catch (error) {
+    console.error('Error reading localStorage data:', error);
+  }
+};
